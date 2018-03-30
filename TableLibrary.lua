@@ -32,4 +32,23 @@ end
 function TableLibrary:Flatten(Data)
 end
 
+function TableLibrary:Flip(Data)
+	assert(type(Data) == "table", "Data is not a table.")
+	local FlippedTable = { }
+	for Key = 1, #Data do
+		local Value = Data[Key]
+		FlippedTable[Value] = Key
+	end
+	return FlippedTable
+end
+
+function TableLibrary:Reverse(Data)
+	assert(type(Data) == "table", "Data is not a table.")
+	local ReversedTable = { }
+	for Index, Value in ipairs(Data) do
+		ReversedTable[#Data - Index + 1] = Value
+	end
+	return ReversedTable
+end
+
 return TableLibrary
