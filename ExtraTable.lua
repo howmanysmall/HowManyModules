@@ -27,7 +27,7 @@ function ExtraTable.Replace(Table, Find, Replace, Recurse)
 	-- @param ____ Find the value you are changing.
 	-- @param ____ Replace the value you are replacing it with.
 	-- @param bool Recurse whether you want to replace inside nested tables aswell.
-	Debug.Assert(type(Table) == "table", "\Table\" is not a table; instead got a: " .. typeof(Table))
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	Debug.Assert(Find, "\"Find\" was not supplied.")
 	Debug.Assert(Replace, "\"Replace\" was not supplied.")
 	local Recurse = Recurse or false
@@ -44,7 +44,7 @@ end
 
 function ExtraTable.Solidify(Table)
 	-- @param table Table the table you are operating on.
-	Debug.Assert(type(Table) == "table", "\Table\" is not a table; instead got a: " .. typeof(Table))
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	local Nils = 0
 	for Index = 1, #Table do
 		if Table[Index] ~= nil then
@@ -59,7 +59,7 @@ end
 function ExtraTable.Fill(Table, Value)
 	-- @param table Table the table you are operating on.
 	-- @param ____ Value the value you want to fill empty spaces.
-	Debug.Assert(type(Table) == "table", "\Table\" is not a table; instead got a: " .. typeof(Table))
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	Debug.Assert(Value, "\"Value\" was not supplied.")
 	for Index = 1, #Table do
 		if Table[Index] == nil then
@@ -71,14 +71,14 @@ end
 function ExtraTable.Dimensional(Table, Dimensions)
 	-- @param table Table the table you are operating on.
 	-- @param number Dimensions how many dimensions you want the new table to be.
-	Debug.Assert(type(Table) == "table", "\Table\" is not a table; instead got a: " .. typeof(Table))
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	return Recurse(Dimensions, (#Table) ^ 1 / Dimensions or 2, Table)
 end
 
 function ExtraTable.Tostring(Table, Deep)
 	-- @param table Table the table you are operating on.
 	-- @param bool Deep whether or not you want to recurse in embeded tables.
-	Debug.Assert(type(Table) == "table", "\Table\" is not a table; instead got a: " .. typeof(Table))
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	local Temporary = { }
 	for Index = 1, #Table do
 		local Value = Table[Index]
@@ -99,8 +99,8 @@ function ExtraTable.Compare(Table1, Table2, Meta, JSON)
 	-- @param table Table2 the table you are comparing to Table1.
 	-- @param bool Meta whether or not you want to compare metatables.
 	-- @param bool JSON whether or not you want to use the EncodeJSON function instead of the Tostring function.
-	Debug.Assert(type(Table1) == "table", "\Table1\" is not a table; instead got a: " .. typeof(Table1))
-	Debug.Assert(type(Table2) == "table", "\Table2\" is not a table; instead got a: " .. typeof(Table2))
+	Debug.Assert(type(Table1) == "table", "\"Table1\" is not a table; instead got a: " .. typeof(Table1))
+	Debug.Assert(type(Table2) == "table", "\"Table2\" is not a table; instead got a: " .. typeof(Table2))
 	if JSON then
 		local Same = ExtraTable:EncodeJSON(Table1) == ExtraTable:EncodeJSON(Table2)
 		if Meta then
@@ -120,11 +120,13 @@ end
 
 function ExtraTable:EncodeJSON(Table)
 	-- @param table Table the table you are operating on.
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	return HttpService:JSONEncode(Table)
 end
 
 function ExtraTable:DecodeJSON(Table)
 	-- @param table Table the table you are operating on.
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	return HttpService:JSONDecode(Table)
 end
 
