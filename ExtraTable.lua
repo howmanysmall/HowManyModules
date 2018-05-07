@@ -3,8 +3,7 @@ local Debug = Resources:LoadLibrary("Debug")
 local HttpService = game:GetService("HttpService")
 local ExtraTable = { }
 
-local Recurse
-function Recurse(Depth, Measure, ToFormat, Table)
+local function Recurse(Depth, Measure, ToFormat, Table)
 	local _Table = { }
 	if Table then Table[#Table + 1] = _Table end
 	if Depth > 1 then
