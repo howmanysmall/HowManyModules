@@ -4,6 +4,9 @@ local HttpService = game:GetService("HttpService")
 local ExtraTable = { }
 
 local function Recurse(Depth, Measure, ToFormat, Table)
+	Debug.Assert(type(Depth) == "number", "\"Depth\" is not a number; instead got a: " .. typeof(Depth))
+	Debug.Assert(type(Measure) == "number", "\"Measure\" is not a number; instead got a: " .. typeof(Measure))
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	local _Table = { }
 	if Table then table.insert(Table, _Table) end
 	if Depth > 1 then
