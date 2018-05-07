@@ -45,7 +45,7 @@ function ExtraTable.Solidify(Table)
 	-- @param table Table the table you are operating on.
 	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	local Nils = 0
-	for Index = 1, #Table do
+	for Index = 1, table.getn(Table) do
 		if Table[Index] ~= nil then
 			table.insert(Table, Index - Nils, table.remove(Table, Index))
 		else
@@ -60,7 +60,7 @@ function ExtraTable.Fill(Table, Value)
 	-- @param ____ Value the value you want to fill empty spaces.
 	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	Debug.Assert(Value, "\"Value\" was not supplied.")
-	for Index = 1, #Table do
+	for Index = 1, table.getn(Table) do
 		if Table[Index] == nil then
 			Table[Index] = Value
 		end
