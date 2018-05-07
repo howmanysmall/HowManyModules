@@ -5,7 +5,7 @@ local ExtraTable = { }
 
 local function Recurse(Depth, Measure, ToFormat, Table)
 	local _Table = { }
-	if Table then Table[#Table + 1] = _Table end
+	if Table then table.insert(Table, _Table) end
 	if Depth > 1 then
 		for Number = 1, Measure do
 			Recurse(Depth - 1, Measure, ToFormat, Table)
@@ -14,7 +14,7 @@ local function Recurse(Depth, Measure, ToFormat, Table)
 		for Number = 1, Measure do
 			local Key, Value = next(ToFormat)
 			if Key then
-				_Table[#_Table + 1] = Value
+				table.insert(_Table, Value)
 				ToFormat[Key] = nil
 			end
 		end
@@ -31,8 +31,7 @@ function ExtraTable.Replace(Table, Find, Replace, Recurse)
 	Debug.Assert(Find, "\"Find\" was not supplied.")
 	Debug.Assert(Replace, "\"Replace\" was not supplied.")
 	local Recurse = Recurse or false
-	for Index = 1, #Table do
-		local Value = Table[Index]
+	for Index, Value in pairs(Table) do
 		if Value == Find then
 			Table[Index] = Replace
 		elseif type(Value) == "table" and Recurse then
@@ -72,7 +71,7 @@ function ExtraTable.Dimensional(Table, Dimensions)
 	-- @param table Table the table you are operating on.
 	-- @param number Dimensions how many dimensions you want the new table to be.
 	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
-	return Recurse(Dimensions, (#Table) ^ 1 / Dimensions or 2, Table)
+	return Recurse(Dimensions, table.getn(Table) ^ 1 / Dimensions or 2, Table)
 end
 
 function ExtraTable.Tostring(Table, Deep)
@@ -80,15 +79,13 @@ function ExtraTable.Tostring(Table, Deep)
 	-- @param bool Deep whether or not you want to recurse in embeded tables.
 	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
 	local Temporary = { }
-	for Index = 1, #Table do
-		local Value = Table[Index]
+	for Index, Value in pairs(Table) do
 		if type(Value) == "table" and Deep then
-			local Table2 = ExtraTable.Tostring(Value, true)
-			for Index2 = 1, #Table2 do
-				Temporary[#Temporary + 1] = tostring(Table2[Index])
+			for Index2, Value2 in pairs(ExtraTable.Tostring(Value, true)) do
+				table.insert(Temporary, tostring(Value2))
 			end
 		else
-			Temporary[#Temporary + 1] = tostring(Value)
+			table.insert(Temporary, tostring(Value))
 		end
 	end
 	return table.concat(Temporary)
