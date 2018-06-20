@@ -4,17 +4,6 @@
 -- @rostrap Button
 -- @author Validark
 
---[[
-	New Use: Button.new(Type, Parent, Properties)
-	Example Usage:
-		local New = Button.new("Flat", script.Parent, {
-			TextColor3 = Colors.Teal[600],
-			Text = "ButtonMake",
-			TextSize = 24,
-			Size = UDim2.new(0, 150, 0, 30)
-		})
-]]--
-
 -- Elevations
 local RAISED_BASE_ELEVATION = 3
 local RAISED_ELEVATION = 6
@@ -28,10 +17,10 @@ local Shadow = Resources:LoadLibrary("Shadow")
 local MouseMovement = Enum.UserInputType.MouseMovement
 
 local ValidInputEnums = {
-	[Enum.UserInputType.Touch] = true;
-	[Enum.UserInputType.MouseButton1] = true;
-	[Enum.UserInputType.MouseButton2] = true;
-	[Enum.UserInputType.MouseButton3] = true;
+	[Enum.UserInputType.Touch] = true,
+	[Enum.UserInputType.MouseButton1] = true,
+	[Enum.UserInputType.MouseButton2] = true,
+	[Enum.UserInputType.MouseButton3] = true
 }
 
 -- Objects
@@ -134,10 +123,10 @@ local function __namecall(self, ...)
 		end
 	elseif Method == "Ripple" then
 		self.Down{
-			UserInputType = Enum.UserInputType.MouseButton1;
+			UserInputType = Enum.UserInputType.MouseButton1,
 			Position = {
-				X = 0.5 * Button.AbsoluteSize.X + Button.AbsolutePosition.X;
-				Y = 0.5 * Button.AbsoluteSize.Y + Button.AbsolutePosition.Y;
+				X = 0.5 * Button.AbsoluteSize.X + Button.AbsolutePosition.X,
+				Y = 0.5 * Button.AbsoluteSize.Y + Button.AbsolutePosition.Y
 			}
 		}
 
@@ -150,7 +139,7 @@ local function __namecall(self, ...)
 end
 
 -- API
-local Button = {}
+local Button = { }
 
 function Button.new(Type, Parent, Properties, ...)
 	assert(Type == "Flat" or Type == "Custom" or Type == "Raised", "[Button] Invalid Button Type; expected \"Flat\", \"Custom\", or \"Raised\"")
@@ -159,8 +148,8 @@ function Button.new(Type, Parent, Properties, ...)
 
 	local Button = TextButton:Clone()
 	local Corner = Button.Corner
-	local Ripplers = {Button.Rippler}
-	local PreviousRipples = {}
+	local Ripplers = { Button.Rippler }
+	local PreviousRipples = { }
 	local RipplerCount = 1
 
 	Corner.BackgroundColor3 = Button.TextColor3
@@ -169,7 +158,7 @@ function Button.new(Type, Parent, Properties, ...)
 	local Metatable = getmetatable(Interactable)
 	Metatable.__newindex = __newindex
 	Metatable.__namecall = __namecall
-	Metatable.Connection = {{Disconnect = function() end}}
+	Metatable.Connection = { { Disconnect = function() end } }
 	
 	function Metatable:__index(i)
 		return Metatable[i] or Button[i]
@@ -189,11 +178,11 @@ function Button.new(Type, Parent, Properties, ...)
 		Ripplers[1]:Destroy()
 		RipplerCount = 5
 		Ripplers = {
-			RaisedRippler:Clone();
-			RaisedRippler2:Clone();
-			RaisedRippler3:Clone();
-			RaisedRippler4:Clone();
-			RaisedRippler5:Clone();
+			RaisedRippler:Clone(),
+			RaisedRippler2:Clone(),
+			RaisedRippler3:Clone(),
+			RaisedRippler4:Clone(),
+			RaisedRippler5:Clone()
 		}
 
 		for a = 1, RipplerCount do
@@ -266,7 +255,7 @@ function Button.new(Type, Parent, Properties, ...)
 	Metatable.Button = Button
 	__newindex(Metatable, "Parent", Parent)
 	
-	for Property, Value in next, Properties do
+	for Property, Value in pairs(Properties) do
 		if type(Property) == "number" then
 			Value.Parent = Button
 		else
@@ -278,7 +267,7 @@ function Button.new(Type, Parent, Properties, ...)
 		local Objects = {...}
 		for a = 1, #Objects do
 			local Object = Button:Clone()
-			for Property, Value in next, Objects[a] do
+			for Property, Value in pairs(Objects[a]) do
 				if type(Property) == "number" then
 					Value.Parent = Object
 				else

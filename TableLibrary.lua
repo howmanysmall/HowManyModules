@@ -1,54 +1,133 @@
-local TableLibrary = { }
+local Resources = require(game:GetService("ReplicatedStorage"):WaitForChild("Resources"))
+local Debug = Resources:LoadLibrary("Debug")
+local HttpService = game:GetService("HttpService")
+local Table = { }
 
-function TableLibrary:BinSearch(Data, Query)
-	assert(type(Data) == "table", "Data is not a table.")
-	local Left = 1
-	local Right = #Data
-	while Left <= Right do
-		local Middle = math.floor(0.5 * (Left + Right))
-		if Data[Middle] == Query then
-			return Middle
-		elseif Data[Middle] > Query then
-			Right = Middle - 1
+local function Recurse(Depth, Measure, ToFormat, Table)
+	Debug.Assert(type(Depth) == "number", "\"Depth\" is not a number; instead got a: " .. typeof(Depth))
+	Debug.Assert(type(Measure) == "number", "\"Measure\" is not a number; instead got a: " .. typeof(Measure))
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
+	local _Table = { }
+	if Table then Table[#Table + 1] = _Table end
+	if Depth > 1 then
+		for Number = 1, Measure do
+			Recurse(Depth - 1, Measure, ToFormat, Table)
+		end
+	else
+		for Number = 1, Measure do
+			local Key, Value = next(ToFormat)
+			if Key then
+				_Table[#_Table + 1] = Value
+				ToFormat[Key] = nil
+			end
+		end
+	end
+	return _Table
+end
+
+function Table.Replace(Table, Find, Replace, Recurse)
+	-- @param table Table the table you are operating on.
+	-- @param value Find the value you are changing.
+	-- @param value Replace the value you are replacing it with.
+	-- @param bool Recurse whether you want to replace inside nested tables aswell.
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
+	Debug.Assert(Find, "\"Find\" was not supplied.")
+	Debug.Assert(Replace, "\"Replace\" was not supplied.")
+	local Recurse = Recurse or false
+	for Index, Value in pairs(Table) do
+		if Value == Find then
+			Table[Index] = Replace
+		elseif type(Value) == "table" and Recurse then
+			Table.Replace(Value, Find, Replace, true)
+		end
+	end
+	return Table
+end
+
+function Table.Solidify(Table)
+	-- @param table Table the table you are operating on.
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
+	local Nils = 0
+	for Index = 1, #Table do
+		if Table[Index] ~= nil then
+			table.insert(Table, Index - Nils, table.remove(Table, Index))
 		else
-			Left = Middle + 1
+			Nils = 1
+		end
+	end
+	return Table
+end
+
+function Table.Fill(Table, Value)
+	-- @param table Table the table you are operating on.
+	-- @param value Value the value you want to fill empty spaces.
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
+	Debug.Assert(Value, "\"Value\" was not supplied.")
+	for Index = 1, #Table do
+		if Table[Index] == nil then
+			Table[Index] = Value
 		end
 	end
 end
 
-function TableLibrary:Search(Data, Query, DeepSearch)
-	assert(type(Data) == "table", "Data is not a table.")
-	DeepSearch = DeepSearch or false
-	for Index = 1, #Data do
-		local Value = Data[Index]
-		if Value == Query then
-			return true, Index, Value
-		elseif DeepSearch and type(Value) == "table" then
-			return TableLibrary:Search(Data, Query, true)
+function Table.Dimensional(Table, Dimensions)
+	-- @param table Table the table you are operating on.
+	-- @param number Dimensions how many dimensions you want the new table to be.
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
+	return Recurse(Dimensions, #Table ^ 1 / Dimensions or 2, Table)
+end
+
+function Table.Tostring(Table, Deep)
+	-- @param table Table the table you are operating on.
+	-- @param bool Deep whether or not you want to recurse in embeded tables.
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
+	local Temporary = { }
+	for Index, Value in pairs(Table) do
+		if type(Value) == "table" and Deep then
+			for Index2, Value2 in pairs(Table.Tostring(Value, true)) do
+				Temporary[#Temporary + 1] = tostring(Value2)
+			end
+		else
+			Temporary[#Temporary + 1] = tostring(Value)
+		end
+	end
+	return table.concat(Temporary)
+end
+
+function Table.Compare(Table1, Table2, Meta, JSON)
+	-- @param table Table1 the table you are comparing to Table2.
+	-- @param table Table2 the table you are comparing to Table1.
+	-- @param bool Meta whether or not you want to compare metatables.
+	-- @param bool JSON whether or not you want to use the EncodeJSON function instead of the Tostring function.
+	Debug.Assert(type(Table1) == "table", "\"Table1\" is not a table; instead got a: " .. typeof(Table1))
+	Debug.Assert(type(Table2) == "table", "\"Table2\" is not a table; instead got a: " .. typeof(Table2))
+	if JSON then
+		local Same = Table:EncodeJSON(Table1) == Table:EncodeJSON(Table2)
+		if Meta then
+			return Same and Table:EncodeJSON(getmetatable(Table1)) == Table:EncodeJSON(getmetatable(Table2))
+		else
+			return Same
+		end
+	else
+		local Same = Table.Tostring(Table1) == Table.Tostring(Table2)
+		if Meta then
+			return Same and Table.Tostring(getmetatable(Table1)) == Table.Tostring(getmetatable(Table2))
+		else
+			return Same
 		end
 	end
 end
 
-function TableLibrary:Flatten(Data)
+function Table:EncodeJSON(Table)
+	-- @param table Table the table you are operating on.
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
+	return HttpService:JSONEncode(Table)
 end
 
-function TableLibrary:Flip(Data)
-	assert(type(Data) == "table", "Data is not a table.")
-	local FlippedTable = { }
-	for Key = 1, #Data do
-		local Value = Data[Key]
-		FlippedTable[Value] = Key
-	end
-	return FlippedTable
+function Table:DecodeJSON(Table)
+	-- @param table Table the table you are operating on.
+	Debug.Assert(type(Table) == "table", "\"Table\" is not a table; instead got a: " .. typeof(Table))
+	return HttpService:JSONDecode(Table)
 end
 
-function TableLibrary:Reverse(Data)
-	assert(type(Data) == "table", "Data is not a table.")
-	local ReversedTable = { }
-	for Index, Value in ipairs(Data) do
-		ReversedTable[#Data - Index + 1] = Value
-	end
-	return ReversedTable
-end
-
-return TableLibrary
+return Table
