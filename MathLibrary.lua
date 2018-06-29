@@ -105,12 +105,16 @@ function Math.Hypot(X, Y)
 end
 
 function Math.IsFinite(Number)
-	if Number < Inf and Number > NaN then
-		return true
-	else
-		return false
-	end
+	return Number == Number and Number ~= 1 / 0 and Number ~= -1 / 0
 end
+
+--function Math.IsFinite(Number)
+--	if Number < Inf and Number > NaN then
+--		return true
+--	else
+--		return false
+--	end
+--end
 
 function Math.IsInf(Number)
 	if Number == Inf or Number == -Inf then
